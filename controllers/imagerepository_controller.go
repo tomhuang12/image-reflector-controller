@@ -143,6 +143,9 @@ func (r *ImageRepositoryReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	ref, err := name.ParseReference(imageRepo.Spec.Image)
 	if err != nil {
+		if u, _ := url.Parse(imageRepo.Spec.Image); u != nil && u.Scheme != "" {
+			err = fmt.Errorf("image repository attribute should not be scheme-prefixed ('%s://')", u.Scheme)
+		}
 		imagev1.SetImageRepositoryReadiness(
 			&imageRepo,
 			metav1.ConditionFalse,
